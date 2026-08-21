@@ -13,3 +13,56 @@ const initialcards = [
 initialcards.forEach(function(card){
     console.log(card.name);
 });
+
+const editButton = document.querySelector('.profile__edit-button');
+const closeButton = document.querySelector('.popup__close');
+const editPopupModal = document.querySelector('#edit-popup');
+let formElement = document.querySelector('.popup__form');
+
+function openModal(modal){
+    modal.classList.add('popup_opened');
+    console.log("4. Open modal");
+}
+
+function closeModal(modal){
+    modal.classList.remove('popup_opened');
+}
+
+editButton.addEventListener('click', function(){
+    handleOpenEditModal();
+    console.log("1. Click en editar")
+});
+
+closeButton.addEventListener("click",function(){
+    closeModal(editPopupModal);
+});
+
+function fillProfileForm(){
+    const profileName = document.querySelector('.profile__title').textContent;
+    const profileDescription = document.querySelector('.profile__description').textContent;
+    const nameInput = document.querySelector('.popup__input_type_name');
+    const descriptionInput = document.querySelector('.popup__input_type_description');
+
+    nameInput.value = profileName;
+    descriptionInput.value = profileDescription;
+};
+
+function handleOpenEditModal(){
+    fillProfileForm();
+    console.log("2. Fill profile form");
+    openModal(editPopupModal);
+    console.log("3. Handler abierto");
+}
+
+function handleProfileFormSubmit(evt){
+    evt.preventDefault();
+
+    let nameInput = document.querySelector('.popup__input_type_name');
+    let descriptionInput = document.querySelector('.popup__input_type_description');
+
+};
+
+formElement.addEventListener('submit', handleProfileFormSubmit);
+
+
+
