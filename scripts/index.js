@@ -20,8 +20,7 @@ const editPopupModal = document.querySelector('#edit-popup');
 let formElement = document.querySelector('.popup__form');
 
 function openModal(modal){
-    modal.classList.add('popup_opened');
-    console.log("4. Open modal");
+    modal.classList.add('popup_opened');    
 }
 
 function closeModal(modal){
@@ -29,8 +28,7 @@ function closeModal(modal){
 }
 
 editButton.addEventListener('click', function(){
-    handleOpenEditModal();
-    console.log("1. Click en editar")
+    handleOpenEditModal();    
 });
 
 closeButton.addEventListener("click",function(){
@@ -48,10 +46,8 @@ function fillProfileForm(){
 };
 
 function handleOpenEditModal(){
-    fillProfileForm();
-    console.log("2. Fill profile form");
-    openModal(editPopupModal);
-    console.log("3. Handler abierto");
+    fillProfileForm();    
+    openModal(editPopupModal);    
 }
 
 function handleProfileFormSubmit(evt){
