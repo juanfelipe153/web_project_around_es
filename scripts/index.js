@@ -10,7 +10,7 @@ const initialCards = [
 ];
 
 
-initialcards.forEach(function(card){
+initialCards.forEach(function(card){
     console.log(card.name);
 });
 
