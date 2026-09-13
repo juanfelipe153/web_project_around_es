@@ -19,6 +19,7 @@ const imageCaption = imagePopUpModal.querySelector(".popup__caption");
 const formElement = document.querySelectorAll('.popup__form');
 const cardTemplate = document.querySelector('#card_template');
 const cardList = document.querySelector('.cards__list');
+const allPopups = document.querySelectorAll('.popup');
 
 
 function openModal(modal){
@@ -131,5 +132,25 @@ function renderCard(name,link,container){
 
 initialCards.forEach((card) =>{
     renderCard(card.name, card.link, cardList);
+});
+
+
+ 
+allPopups.forEach((popup) => {
+    popup.addEventListener('click', function(evt) {
+        if (evt.target === evt.currentTarget) {
+            closeModal(popup);
+        }
+    });
+});
+ 
+
+document.addEventListener('keydown', function(evt) {
+    if (evt.key === 'Escape') {
+        const openedPopup = document.querySelector('.popup_is-opened');
+        if (openedPopup) {
+            closeModal(openedPopup);
+        }
+    }
 });
 
