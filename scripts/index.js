@@ -22,7 +22,7 @@ const cardList = document.querySelector('.cards__list');
 
 
 function openModal(modal){
-    modal.classList.add('popup_is-opened');    
+    modal.classList.add('popup_is-opened');
 }
 
 
@@ -32,7 +32,7 @@ function closeModal(modal){
 
 
 editButton.addEventListener('click', function(){
-    handleOpenEditModal();    
+    handleOpenEditModal();
 });
 
 addCardButton.addEventListener("click",function(){
@@ -51,7 +51,7 @@ function fillProfileForm(){
     const profileName = document.querySelector('.profile__title').textContent;
     const profileDescription = document.querySelector('.profile__description').textContent;
     const nameInput = document.querySelector('.popup__input_type_name');
-    const descriptionInput = document.querySelector('.popup__input_type_description');    
+    const descriptionInput = document.querySelector('.popup__input_type_description');
 
     nameInput.value = profileName;
     descriptionInput.value = profileDescription;
@@ -59,8 +59,8 @@ function fillProfileForm(){
 
 
 function handleOpenEditModal(){
-    fillProfileForm();    
-    openModal(editPopupModal);    
+    fillProfileForm();
+    openModal(editPopupModal);
 }
 
 
@@ -87,27 +87,14 @@ function handleCardFormSubmit(evt){
 
     renderCard(nameInput.value,linkInput.value,cardList);
 
+    evt.target.reset();
     closeModal(newCardPopUpModal);
 };
 
 
-
-formElement.forEach((form) => {
-    form.addEventListener('submit', function(evt){
-
-        if(evt.target.id == "new-card-form" ){
-            handleCardFormSubmit(evt);
-        }
-        else if(evt.target.id == "edit-profile-form" ){
-            handleProfileFormSubmit(evt);
-        };        
-    });
-});
-
-
-function getCardElement(name="Sin título",link="./images/placeholder.jpg"){    
+function getCardElement(name="Sin título",link="./images/placeholder.jpg"){
     const cardElement = cardTemplate.content.cloneNode(true);
-    
+
     const cardName = cardElement.querySelector(".card__title");
     cardName.textContent = name;
 
@@ -127,9 +114,9 @@ function getCardElement(name="Sin título",link="./images/placeholder.jpg"){
 
     const deleteButton = cardElement.querySelector(".card__delete-button");
     deleteButton.addEventListener("click", function(evt) {
-    evt.target.closest(".card").remove();
-});
-    
+        evt.target.closest(".card").remove();
+    });
+
     cardImageLink.alt = name;
 
     return cardElement;
