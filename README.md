@@ -17,6 +17,7 @@ TECNOLOGÍAS:
 -JavaScript
 -DOM Manipulation
 -Git / GitHub
+-Form validation
 
 
 Autor:
