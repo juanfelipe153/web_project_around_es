@@ -19,11 +19,20 @@ const imageCaption = imagePopUpModal.querySelector(".popup__caption");
 const formElement = document.querySelectorAll('.popup__form');
 const cardTemplate = document.querySelector('#card_template');
 const cardList = document.querySelector('.cards__list');
+const profileTitle = document.querySelector('.profile__title');
 const allPopups = document.querySelectorAll('.popup');
 
-
+let escListenersAttached = false;
+ 
+ 
 function openModal(modal){
     modal.classList.add('popup_is-opened');
+    
+    if (!escListenersAttached) {
+        escFocusOut();
+        escPopUp();
+        escListenersAttached = true;
+    }
 }
 
 
@@ -49,7 +58,7 @@ closeButton.forEach((popUpCloseBtn) => {
 
 
 function fillProfileForm(){
-    const profileName = document.querySelector('.profile__title').textContent;
+    const profileName = profileTitle.textContent;
     const profileDescription = document.querySelector('.profile__description').textContent;
     const nameInput = document.querySelector('.popup__input_type_name');
     const descriptionInput = document.querySelector('.popup__input_type_description');
@@ -70,7 +79,6 @@ function handleProfileFormSubmit(evt){
 
     const nameInput = document.querySelector('.popup__input_type_name');
     const descriptionInput = document.querySelector('.popup__input_type_description');
-    const profileTitle = document.querySelector('.profile__title');
     const profileDescription = document.querySelector('.profile__description');
 
     profileTitle.textContent = nameInput.value;
@@ -134,18 +142,20 @@ initialCards.forEach((card) =>{
     renderCard(card.name, card.link, cardList);
 });
 
-
  
-allPopups.forEach((popup) => {
+function escFocusOut() {
+    allPopups.forEach((popup) => {
     popup.addEventListener('click', function(evt) {
         if (evt.target === evt.currentTarget) {
             closeModal(popup);
         }
     });
 });
- 
+}
 
-document.addEventListener('keydown', function(evt) {
+
+function escPopUp() {
+    document.addEventListener('keydown', function(evt) {
     if (evt.key === 'Escape') {
         const openedPopup = document.querySelector('.popup_is-opened');
         if (openedPopup) {
@@ -153,4 +163,14 @@ document.addEventListener('keydown', function(evt) {
         }
     }
 });
+}
 
+
+
+ 
+formElement.forEach((form) => {
+    setEventListeners(form, { handleCardFormSubmit, handleProfileFormSubmit });
+});
+ 
+
+import { setEventListeners } from "./validate.js";

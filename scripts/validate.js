@@ -35,49 +35,47 @@ function validateInput(inputElement, inputList, submitButton) {
     toggleButtonState(inputList, submitButton);
 }
 
-function setEventListeners(form) {
+function setEventListeners(form, handlers) {
     const inputList = Array.from(form.querySelectorAll('.popup__input'));
     const submitButton = form.querySelector('.popup__button');
-
-    toggleButtonState(inputList, submitButton); 
-
+ 
+    toggleButtonState(inputList, submitButton);
+ 
     inputList.forEach((inputElement) => {
         inputElement.addEventListener('input', () => {
             validateInput(inputElement, inputList, submitButton);
         });
-
+ 
         inputElement.addEventListener('blur', () => {
             validateInput(inputElement, inputList, submitButton);
         });
     });
-
+ 
     form.addEventListener('submit', (evt) => {
         let formValid = true;
-
+ 
         inputList.forEach((inputElement) => {
             if (!inputElement.validity.valid) {
                 showErrorMessage(inputElement, inputElement.validationMessage);
                 formValid = false;
             }
         });
-
+ 
         if (!formValid) {
             evt.preventDefault();
             return;
         }
-
+ 
         if (evt.target.id === "new-card-form") {
-            handleCardFormSubmit(evt);
+            handlers.handleCardFormSubmit(evt);
         } else if (evt.target.id === "edit-profile-form") {
-            handleProfileFormSubmit(evt);
+            handlers.handleProfileFormSubmit(evt);
         }
-
-       
+ 
         toggleButtonState(inputList, submitButton);
     });
 }
-
-formElement.forEach((form) => {
-    setEventListeners(form);
-});
  
+
+
+export { setEventListeners };
