@@ -85,15 +85,7 @@ export class FormValidator {
                 evt.preventDefault();
                 return;
             }
-    
-            /* Mover esta parte
-            if (evt.target.id === "new-card-form") {
-                handlers.handleCardFormSubmit(evt);
-            } else if (evt.target.id === "edit-profile-form") {
-                handlers.handleProfileFormSubmit(evt);
-            }*/
-    
-            
+                           
         });
     };
     

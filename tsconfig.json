@@ -1,8 +1,12 @@
 {
   "compilerOptions": {
+    "target": "ES6",
+    "module": "esnext",
     "rootDir": "./src",
     "outDir": "./public",
-    "allowJs": true
+    "allowJs": true,
+    "strict": true,
+    "moduleResolution": "bundler",
+    "sourceMap": true
   }
 }
-
