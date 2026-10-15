@@ -13,7 +13,7 @@ export const defaultFormConfig = {
     inputSelector: '.popup__input',
     submitButtonSelector: '.popup__button',
     inputErrorStyle: '.form__input-error',
-    inputErrorActive: '.form__input-error_active',
+    inputErrorActive: 'form__input-error_active',
     templateSelector: '#card_template',    
 };
 

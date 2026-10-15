@@ -17,38 +17,39 @@ export class Card {
         this.handleCardClick = handleCardClick;
     }
 
-    private getTemplate(): HTMLElement{
-        const cardElement = this.templateSelector.content.cloneNode(true) as HTMLElement;
-        return cardElement;
-    };
-    
-    public generateCard(){
-        
-        const cardElement = this.getTemplate() ;
-        
-        const cardName = cardElement.querySelector(".card__title") as HTMLElement;
-        cardName.textContent = this.cardTitle;
+    private getTemplate(): HTMLElement {
+    return this.templateSelector.content
+        .querySelector(".card")!
+        .cloneNode(true) as HTMLElement;
+}
 
-        const cardImageLink = cardElement.querySelector(".card__image") as HTMLImageElement;
-        cardImageLink.src = this.cardImage;
-        cardImageLink.addEventListener("click",() => {
+public generateCard(): HTMLElement {
+    const cardElement = this.getTemplate();
 
-            this.handleCardClick(this.cardImage,this.cardTitle) ;     
-            
-        });
+    const cardName = cardElement.querySelector(".card__title") as HTMLElement;
+    cardName.textContent = this.cardTitle;
 
-        const likeButton = cardElement.querySelector(".card__like-button");
-        likeButton!.addEventListener("click",function(){
-            likeButton!.classList.toggle("card__like-button_is-active");
-        });
+    const cardImageLink = cardElement.querySelector(".card__image") as HTMLImageElement;
+    cardImageLink.src = this.cardImage;
+    cardImageLink.alt = this.cardTitle;
+    cardImageLink.addEventListener("click", () => {
+        this.handleCardClick(this.cardImage, this.cardTitle);
+    });
 
-        const deleteButton = cardElement.querySelector(".card__delete-button");
-        deleteButton!.addEventListener("click", function() {
-            cardElement.remove();
-        });
+    const likeButton = cardElement.querySelector(".card__like-button") as HTMLButtonElement;
+    likeButton.setAttribute("aria-label", "Me gusta");
+    likeButton.addEventListener("click", () => {
+        likeButton.classList.toggle("card__like-button_is-active");
+    });
 
-        return cardElement;
-    };
+    const deleteButton = cardElement.querySelector(".card__delete-button") as HTMLButtonElement;
+    deleteButton.setAttribute("aria-label", "Eliminar tarjeta");
+    deleteButton.addEventListener("click", () => {
+        cardElement.remove();
+    });
+
+    return cardElement;
+};
 
     
 };
