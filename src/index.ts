@@ -25,7 +25,7 @@ function createCard(item: { cardImage: string; cardTitle: string }) {
         { cardImage: item.cardImage, cardTitle: item.cardTitle },
         cardTemplate,
         (cardImage, cardTitle) => {
-            imagePopup.open(cardImage, cardTitle); 
+            imagePopup.open( cardTitle,cardImage); 
         }
     );
     

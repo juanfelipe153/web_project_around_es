@@ -15,7 +15,7 @@ imagePopup.setEventListeners();
 function createCard(item) {
     const cardTemplate = document.querySelector(defaultFormConfig.templateSelector);
     const card = new Card({ cardImage: item.cardImage, cardTitle: item.cardTitle }, cardTemplate, (cardImage, cardTitle) => {
-        imagePopup.open(cardImage, cardTitle);
+        imagePopup.open(cardTitle, cardImage);
     });
     return card.generateCard();
 }
