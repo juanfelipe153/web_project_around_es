@@ -7,7 +7,6 @@ export class Popup{
         this.popupElement = popupSelector;
         this.handleEscClose = this.handleEscClose.bind(this);      
     };
-
     
 
     public open():void{

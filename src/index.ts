@@ -13,6 +13,27 @@ const userInfo = new UserInfo({
 });
 
 
+const loadUserInfoServerData = async (): Promise<void> => {
+    try{
+        const res = await fetch('https://around-api.es.tripleten-services.com/v1/users/me',{headers: {authorization: "38205c13-8d01-4040-9b30-ad9e7a82c9cb"}});
+        
+        if(!res.ok) {
+            throw new Error('Error: ' + res.status);
+        }
+        const data = await res.json();
+        userInfo.setUserInfo({
+            name: data.name,
+            about: data.about
+        });
+    }
+    catch(error){
+        console.error('Error fetching user data:', error);
+    }   
+};
+loadUserInfoServerData();
+
+
+
 const imagePopupElement = document.querySelector('#image-popup') as HTMLElement; 
 const imagePopup = new PopupWithImage(imagePopupElement);
 imagePopup.setEventListeners();
@@ -27,36 +48,72 @@ function createCard(item: { cardImage: string; cardTitle: string }) {
         (cardImage, cardTitle) => {
             imagePopup.open( cardTitle,cardImage); 
         }
-    );
-    
+    );    
     return card.generateCard();
 }
 
-
 const cardListContainer = document.querySelector('.cards__list') as HTMLElement; 
-const cardSection = new Section(
-    {
-        itemsList: initialCards.map(c => ({ cardImage: c.link, cardTitle: c.name })),
-        renderer: (item) => {
-            const cardElement = createCard(item);
-            cardSection.addItem(cardElement);
+let cardSection: Section<{ cardImage: string; cardTitle: string }>;
+
+const loadInitialCardsFromServer = async (): Promise<void> => {
+    try{
+        const res = await fetch("https://around-api.es.tripleten-services.com/v1/cards/",{headers: {authorization: "38205c13-8d01-4040-9b30-ad9e7a82c9cb"}});
+        if(!res.ok) {
+            throw new Error('Error: ' + res.status);
         }
-    },
-    cardListContainer
-);
-cardSection.renderItems();
+        const dataArray = await res.json();
+        cardSection = new Section(
+            {
+                itemsList: dataArray.map((c:any) => ({ cardImage: c.link, cardTitle: c.name })),
+                renderer: (item) => {
+                    const cardElement = createCard(item);
+                    cardSection.addItem(cardElement);
+                }
+            },
+            cardListContainer
+        );
+        cardSection.renderItems();
+    }
+    catch(error){
+        console.error('Error fetching initial cards:', error);
+    }
+};
+loadInitialCardsFromServer();
+
 
 
 const profilePopupElement = document.querySelector('#edit-popup') as HTMLElement; 
 const profilePopup = new PopupWithForm(
     profilePopupElement,
-    (formData) => {
+    async (formData) => {
+        try{
+            const res = await fetch('https://around-api.es.tripleten-services.com/v1/users/me',{
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'authorization': "38205c13-8d01-4040-9b30-ad9e7a82c9cb"
+                },
+                body: JSON.stringify({
+                    name: formData.name,
+                    about: formData.description
+                })
+            });
+
+            if(!res.ok) {
+                throw new Error('Error: ' + res.status);
+            }
+
+            const updatedData = await res.json();
+            userInfo.setUserInfo({
+                name: updatedData.name,
+                about: updatedData.about
+            });
+            profilePopup.close();
+        }        
         
-        userInfo.setUserInfo({
-            name: formData.name,
-            about: formData.description
-        });
-        profilePopup.close();
+        catch(error){
+            console.error('Error updating user info:', error);
+        }       
     }
 );
 profilePopup.setEventListeners();
