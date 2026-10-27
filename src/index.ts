@@ -39,14 +39,36 @@ const imagePopup = new PopupWithImage(imagePopupElement);
 imagePopup.setEventListeners();
 
 
-function createCard(item: { cardImage: string; cardTitle: string }) {
+function createCard(item: { cardImage: string; cardTitle: string; cardID?: string; isLiked?: boolean}) {
     const cardTemplate = document.querySelector(defaultFormConfig.templateSelector) as HTMLTemplateElement;
     
     const card = new Card(
-        { cardImage: item.cardImage, cardTitle: item.cardTitle },
+        { cardImage: item.cardImage, cardTitle: item.cardTitle, cardID: item.cardID || " ", isLiked: item.isLiked || false},
         cardTemplate,
         (cardImage, cardTitle) => {
             imagePopup.open( cardTitle,cardImage); 
+        },
+        async (cardInstance) => {
+            const isLiked = cardInstance.isLikedStatus();
+            const fetchMethod = isLiked ? "DELETE" : "PUT";
+
+            try{
+                const res = await fetch(`https://around-api.es.tripleten-services.com/v1/cards/likes/${cardInstance.getID()}`,{
+                    method: fetchMethod,
+                    headers: {authorization: "38205c13-8d01-4040-9b30-ad9e7a82c9cb"}
+                })
+                    
+                if(!res.ok){
+                    throw new Error ("Error"+ res.status);
+                }
+
+                const updatedData = await res.json();
+                cardInstance.setLikeStatus(updatedData.isLiked);
+
+            }
+            catch(error){
+                console.error('Error:', error);
+            }
         }
     );    
     return card.generateCard();
@@ -64,7 +86,7 @@ const loadInitialCardsFromServer = async (): Promise<void> => {
         const dataArray = await res.json();
         cardSection = new Section(
             {
-                itemsList: dataArray.map((c:any) => ({ cardImage: c.link, cardTitle: c.name })),
+                itemsList: dataArray.map((c:any) => ({ cardImage: c.link, cardTitle: c.name,cardID: c._id, isLiked: c.isLiked })),
                 renderer: (item) => {
                     const cardElement = createCard(item);
                     cardSection.addItem(cardElement);
