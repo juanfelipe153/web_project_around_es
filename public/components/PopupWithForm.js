@@ -5,6 +5,17 @@ export class PopupWithForm extends Popup {
         this.handleFormSubmit = handleFormSubmit;
         this.form = this.popupElement.querySelector('.popup__form');
         this.inputList = this.form.querySelectorAll('.popup__input');
+        this.submitButton = this.popupElement.querySelector('.popup__button');
+        this.submitButtonText = this.submitButton.textContent || 'Guardar';
+    }
+    ;
+    renderLoading(isLoading, loadingText = "Guardando...") {
+        if (isLoading) {
+            this.submitButton.textContent = loadingText;
+        }
+        else {
+            this.submitButton.textContent = this.submitButtonText;
+        }
     }
     ;
     getInputValues() {

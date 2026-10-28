@@ -1,6 +1,6 @@
 ;
 export class Card {
-    constructor(CardData, templateSelector, handleCardClick, handleLikeClick) {
+    constructor(CardData, templateSelector, handleCardClick, handleLikeClick, handleDeleteClick) {
         this.cardImage = CardData.cardImage;
         this.cardTitle = CardData.cardTitle;
         this.cardID = CardData.cardID;
@@ -8,6 +8,7 @@ export class Card {
         this.templateSelector = templateSelector;
         this.handleCardClick = handleCardClick;
         this.handleLikeClick = handleLikeClick;
+        this.handleDeleteClick = handleDeleteClick;
     }
     getTemplate() {
         return this.templateSelector.content
@@ -35,6 +36,7 @@ export class Card {
     ;
     generateCard() {
         const cardElement = this.getTemplate();
+        this.cardElement = cardElement;
         const cardName = cardElement.querySelector(".card__title");
         cardName.textContent = this.cardTitle;
         const cardImageLink = cardElement.querySelector(".card__image");
@@ -49,18 +51,21 @@ export class Card {
             this.likeButtonELement.classList.add("card__like-button_is-active");
         }
         this.likeButtonELement.addEventListener("click", () => {
+            console.log("1. ¡Se hizo clic en el botón de la tarjeta!", this.cardID);
             this.handleLikeClick(this);
         });
-        /*Hay que incluir esto en loadInitialCards y createCards
-        });*/
         const deleteButton = cardElement.querySelector(".card__delete-button");
         deleteButton.setAttribute("aria-label", "Eliminar tarjeta");
         deleteButton.addEventListener("click", () => {
-            cardElement.remove();
+            //cardElement.remove();
+            this.handleDeleteClick(this);
         });
         return cardElement;
     }
     ;
+    removeCard() {
+        this.cardElement.remove();
+    }
 }
 ;
 //# sourceMappingURL=Card.js.map

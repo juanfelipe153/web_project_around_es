@@ -15,6 +15,8 @@ export class Card {
     private handleCardClick: (cardImage:string, cardTitle:string) => void;
     private handleLikeClick: (cardInstance: Card) => void;
     private likeButtonELement!: HTMLButtonElement;
+    private handleDeleteClick: (cardInstance: Card) => void;
+    private cardElement!: HTMLElement;
 
     constructor ( CardData:{
         cardImage:string,
@@ -24,7 +26,8 @@ export class Card {
         }, 
         templateSelector: HTMLTemplateElement,
         handleCardClick: (cardImage:string, cardTitle:string) => void,
-        handleLikeClick: (cardInstance: Card) => void){
+        handleLikeClick: (cardInstance: Card) => void,
+        handleDeleteClick: (cardInstance: Card) => void){
         this.cardImage = CardData.cardImage;
         this.cardTitle = CardData.cardTitle;
         this.cardID = CardData.cardID;
@@ -32,6 +35,7 @@ export class Card {
         this.templateSelector = templateSelector;
         this.handleCardClick = handleCardClick;
         this.handleLikeClick = handleLikeClick;
+        this.handleDeleteClick = handleDeleteClick;
     }
 
     private getTemplate(): HTMLElement {
@@ -62,6 +66,7 @@ public setLikeStatus(isLiked:boolean):void{
 
 public generateCard(): HTMLElement {
     const cardElement = this.getTemplate();
+    this.cardElement = cardElement;
 
     const cardName = cardElement.querySelector(".card__title") as HTMLElement;
     cardName.textContent = this.cardTitle;
@@ -81,20 +86,25 @@ public generateCard(): HTMLElement {
     }
 
     this.likeButtonELement.addEventListener("click",() => {
+        console.log("1. ¡Se hizo clic en el botón de la tarjeta!", this.cardID);
         this.handleLikeClick(this);
     });
     
-    /*Hay que incluir esto en loadInitialCards y createCards
-    });*/
+   
 
     const deleteButton = cardElement.querySelector(".card__delete-button") as HTMLButtonElement;
     deleteButton.setAttribute("aria-label", "Eliminar tarjeta");
     deleteButton.addEventListener("click", () => {
-        cardElement.remove();
+        //cardElement.remove();
+        this.handleDeleteClick(this);
     });
 
     return cardElement;
 };
+
+public removeCard():void{
+    this.cardElement.remove();
+}
 
     
 };

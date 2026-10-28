@@ -4,26 +4,36 @@ import { PopupWithImage } from './components/PopupWithImage.js';
 import { PopupWithForm } from './components/PopupWithForm.js';
 import { Section } from './components/Section.js';
 import { UserInfo } from './components/UserInfo.js';
-import { initialCards, defaultFormConfig } from './utils/constants.js';
+import { defaultFormConfig } from './utils/constants.js';
+import { PopupWithConfirmation } from './components/PopupWithConfirmation.js';
+import { API } from './components/API.js';
 
 
 const userInfo = new UserInfo({
     nameSelector: '.profile__title',
-    aboutSelector: '.profile__description'
+    aboutSelector: '.profile__description',
+    avatarImageSelector: '.profile__image',
+});
+
+
+const api = new API({
+  baseUrl: "https://around-api.es.tripleten-services.com/v1",
+  headers: {
+    authorization: "38205c13-8d01-4040-9b30-ad9e7a82c9cb",
+    "Content-Type": "application/json"
+  }
 });
 
 
 const loadUserInfoServerData = async (): Promise<void> => {
     try{
-        const res = await fetch('https://around-api.es.tripleten-services.com/v1/users/me',{headers: {authorization: "38205c13-8d01-4040-9b30-ad9e7a82c9cb"}});
         
-        if(!res.ok) {
-            throw new Error('Error: ' + res.status);
-        }
-        const data = await res.json();
+        const data = await api.getUserInfo();
         userInfo.setUserInfo({
             name: data.name,
-            about: data.about
+            about: data.about,
+            avatarImage: data.avatar
+
         });
     }
     catch(error){
@@ -38,6 +48,14 @@ const imagePopupElement = document.querySelector('#image-popup') as HTMLElement;
 const imagePopup = new PopupWithImage(imagePopupElement);
 imagePopup.setEventListeners();
 
+const confirmPopupElement = document.querySelector("#confirm-popup") as HTMLElement;
+const confirmPopup = new PopupWithConfirmation(confirmPopupElement);
+confirmPopup.setEventListeners();
+
+
+
+
+
 
 function createCard(item: { cardImage: string; cardTitle: string; cardID?: string; isLiked?: boolean}) {
     const cardTemplate = document.querySelector(defaultFormConfig.templateSelector) as HTMLTemplateElement;
@@ -46,44 +64,52 @@ function createCard(item: { cardImage: string; cardTitle: string; cardID?: strin
         { cardImage: item.cardImage, cardTitle: item.cardTitle, cardID: item.cardID || " ", isLiked: item.isLiked || false},
         cardTemplate,
         (cardImage, cardTitle) => {
-            imagePopup.open( cardTitle,cardImage); 
+            imagePopup.open(cardTitle,cardImage); 
         },
-        async (cardInstance) => {
+        async (cardInstance) => {            
             const isLiked = cardInstance.isLikedStatus();
-            const fetchMethod = isLiked ? "DELETE" : "PUT";
-
-            try{
-                const res = await fetch(`https://around-api.es.tripleten-services.com/v1/cards/likes/${cardInstance.getID()}`,{
-                    method: fetchMethod,
-                    headers: {authorization: "38205c13-8d01-4040-9b30-ad9e7a82c9cb"}
-                })
-                    
-                if(!res.ok){
-                    throw new Error ("Error"+ res.status);
-                }
-
-                const updatedData = await res.json();
+            
+            try{                
+                
+                const updatedData = await api.changeLikeCardStatus(cardInstance.getID(),!isLiked);             
                 cardInstance.setLikeStatus(updatedData.isLiked);
 
             }
             catch(error){
                 console.error('Error:', error);
+                console.error('5. Error atrapado en el catch:', error);
             }
+        },
+        (cardInstance) => {
+            confirmPopup.setSubmitAction(async() => {
+                try{
+                   
+                    await api.deleteCard(cardInstance.getID());
+                    cardInstance.removeCard();
+                    confirmPopup.close();
+                }
+                catch(error){
+                    console.error("Error deleting card:",error);
+                }
+            });
+            confirmPopup.open();
         }
+        
     );    
     return card.generateCard();
 }
+
+
+
+
 
 const cardListContainer = document.querySelector('.cards__list') as HTMLElement; 
 let cardSection: Section<{ cardImage: string; cardTitle: string }>;
 
 const loadInitialCardsFromServer = async (): Promise<void> => {
     try{
-        const res = await fetch("https://around-api.es.tripleten-services.com/v1/cards/",{headers: {authorization: "38205c13-8d01-4040-9b30-ad9e7a82c9cb"}});
-        if(!res.ok) {
-            throw new Error('Error: ' + res.status);
-        }
-        const dataArray = await res.json();
+        
+        const dataArray = await api.getInitialCards();
         cardSection = new Section(
             {
                 itemsList: dataArray.map((c:any) => ({ cardImage: c.link, cardTitle: c.name,cardID: c._id, isLiked: c.isLiked })),
@@ -109,33 +135,25 @@ const profilePopup = new PopupWithForm(
     profilePopupElement,
     async (formData) => {
         try{
-            const res = await fetch('https://around-api.es.tripleten-services.com/v1/users/me',{
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'authorization': "38205c13-8d01-4040-9b30-ad9e7a82c9cb"
-                },
-                body: JSON.stringify({
-                    name: formData.name,
-                    about: formData.description
-                })
+            profilePopup.renderLoading(true, 'Guardando...');
+           
+            const updatedData = await api.updateUserInfo({
+                name: formData.name,
+                about: formData.description
             });
 
-            if(!res.ok) {
-                throw new Error('Error: ' + res.status);
-            }
-
-            const updatedData = await res.json();
             userInfo.setUserInfo({
                 name: updatedData.name,
-                about: updatedData.about
+                about: updatedData.about                
             });
             profilePopup.close();
-        }        
-        
+        }    
         catch(error){
             console.error('Error updating user info:', error);
-        }       
+        } 
+        finally{
+            profilePopup.renderLoading(false);
+        }
     }
 );
 profilePopup.setEventListeners();
@@ -144,12 +162,26 @@ profilePopup.setEventListeners();
 const cardPopupElement = document.querySelector('#new-card-popup') as HTMLElement; 
 const cardPopup = new PopupWithForm(
     cardPopupElement,
-    (formData) => {
-        
-        const newCardData = { cardImage: formData.link, cardTitle: formData['place-name'] };
-        const cardElement = createCard(newCardData);
+    async (formData) => {
+        try{
+            cardPopup.renderLoading(true, 'Creando...');
+            
+
+        const cardDataToServer = await api.addCard({
+            name: formData['place-name'],
+            link:formData.link
+        })
+                
+        const cardElement = createCard({cardImage: cardDataToServer.link, cardTitle: cardDataToServer.name, cardID: cardDataToServer._id, isLiked: cardDataToServer.isLiked});
         cardSection.addItem(cardElement);
         cardPopup.close();
+        } 
+        catch(error){
+            console.error('Error creating new card:', error);
+        }
+        finally{
+            cardPopup.renderLoading(false);
+        }       
     }
 );
 cardPopup.setEventListeners();
@@ -192,3 +224,40 @@ cardAddButton.addEventListener('click', () => {
     formValidators['new-card-form']?.resetValidation(); 
     cardPopup.open();
 });
+
+const avatarPopupElement = document.querySelector('#edit-avatar-popup') as HTMLElement;
+const avatarPopup = new PopupWithForm(
+    avatarPopupElement,
+    async (formData) => {
+        try {
+            avatarPopup.renderLoading(true, 'Guardando...');
+
+            const userData = await api.updateUserAvatar({
+                avatar: formData.avatar
+            })
+
+            
+            const profileImage = document.querySelector('.profile__image') as HTMLImageElement;
+            if (profileImage) {
+                profileImage.src = userData.avatar;
+            }
+
+            avatarPopup.close();
+
+        } catch (error) {
+            console.error('Error updating avatar:', error);
+        }
+        finally {
+            avatarPopup.renderLoading(false);
+        }
+    }
+);
+avatarPopup.setEventListeners();
+
+
+const editAvatarButton = document.querySelector('.profile__image-edit-button') as HTMLElement;
+if (editAvatarButton) {
+    editAvatarButton.addEventListener('click', () => {
+        avatarPopup.open();
+    });
+}

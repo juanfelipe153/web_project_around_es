@@ -37,13 +37,20 @@
   max-width: 373px;
 }
 
-.profile__image {
-  width: 120px;
+.profile__image-container {
+  position: relative;
+  width: 120px; 
   height: 120px;
   border-radius: 50%;
-  object-fit: cover;
-  background-position: center;
+  cursor: pointer;
   margin-right: 29px;
+}
+
+.profile__image {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .profile__add-button {
@@ -135,4 +142,27 @@
     height: 18px;
     background-size: 8px 8px;
   }
+}
+
+
+.profile__image-edit-button {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.6); 
+  background-image: url('../images/Vector.png'); 
+  background-repeat: no-repeat;
+  background-position: center;
+  border: none;
+  cursor: pointer;
+  opacity: 0; /* Oculto por defecto */
+  transition: opacity 0.3s ease; /* Transición suave */
+}
+
+/*-----HOVER-----------*/
+.profile__image-container:hover .profile__image-edit-button {
+  opacity: 1;
 }
